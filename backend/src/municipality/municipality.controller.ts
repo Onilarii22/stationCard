@@ -11,7 +11,7 @@ import { MunicipalityService } from './municipality.service';
 import { CreateMunicipalityDto } from './dto/create-municipality.dto';
 import { UpdateMunicipalityDto } from './dto/update-municipality.dto';
 
-@Controller('Municipality')
+@Controller('municipality')
 export class MunicipalityController {
   constructor(private readonly municipalityService: MunicipalityService) {}
 

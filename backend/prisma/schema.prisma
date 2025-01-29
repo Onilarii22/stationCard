@@ -14,22 +14,42 @@ datasource db {
 }
 
 model User {
+  id        String   @id @default(cuid())
+  firstname String
+  lastname  String
+  email     String   @unique
+  password  String
+  Company   Company? @relation(fields: [companyId], references: [id])
+  companyId String?
+}
+
+model Beneficiary {
   id                   String @id @default(cuid())
-  name                 String
+  firstname            String
+  lastname             String
   email                String @unique
   availableTotalAmount Float  @default(0.0)
   remainingAmount      Float  @default(0.0)
   expense              Float
-  company              String
 
   transactions Transaction[]
+  company      Company?      @relation(fields: [companyId], references: [id])
+  companyId    String?
 }
 
-model Employe {
-  id       String @id @default(cuid())
-  name     String
-  email    String @unique
-  password String
+model Company {
+  id            String        @id @default(cuid())
+  name          String        @unique
+  beneficiaries Beneficiary[]
+  workers       User[]
+}
+
+model StationEmploye {
+  id        String @id @default(cuid())
+  firstname String
+  lastname  String
+  email     String @unique
+  password  String
 
   station     Station       @relation(fields: [stationId], references: [id])
   stationId   String
@@ -39,13 +59,13 @@ model Employe {
 model Transaction {
   id String @id @default(cuid())
 
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
+  beneficiary   Beneficiary? @relation(fields: [beneficiaryId], references: [id])
+  beneficiaryId String
 
-  employe   Employe? @relation(fields: [employeId], references: [id])
-  employeId String
-  station   Station? @relation(fields: [stationId], references: [id])
-  stationId String
+  stationEmploye   StationEmploye? @relation(fields: [stationEmployeId], references: [id])
+  stationEmployeId String
+  station          Station?        @relation(fields: [stationId], references: [id])
+  stationId        String
 }
 
 model Station {
@@ -54,7 +74,7 @@ model Station {
 
   transactions Transaction[]
 
-  employes Employe[]
+  stationEmployes StationEmploye[]
 
   district   District? @relation(fields: [districtId], references: [id])
   districtId String
@@ -97,7 +117,9 @@ model Department {
 }
 
 model Admin {
-  id    String @id @default(cuid())
-  name  String
-  email String @unique
+  id        String @id @default(cuid())
+  firstname String
+  lastname  String
+  email     String @unique
+  password  String
 }
