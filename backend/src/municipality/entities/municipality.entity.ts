@@ -8,5 +8,5 @@ export class Municipality {
 
   @ApiProperty()
   @IsString()
-  cityId: string;
+  departmentId: string;
 }

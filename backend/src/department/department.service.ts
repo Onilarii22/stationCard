@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateDepartmentDto } from './dto/create-department.dto';
 import { UpdateDepartmentDto } from './dto/update-department.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -25,14 +29,25 @@ export class DepartmentService {
   }
 
   async findById(id: string) {
-    return await this.prisma.department.findUnique({ where: { id } });
+    const department = await this.prisma.department.findUnique({
+      where: { id },
+    });
+    if (!department) throw new NotFoundException('Department not found!');
+    return department;
   }
 
   async findByName(name: string) {
-    return await this.prisma.department.findUnique({ where: { name } });
+    const department = await this.prisma.department.findUnique({
+      where: { name },
+    });
+    if (!department) throw new NotFoundException('Department not found!');
+    return department;
   }
 
   async update(id: string, data: UpdateDepartmentDto) {
+    const department = await this.findById(id);
+    if (!department)
+      throw new NotFoundException("This department doesn't exist!");
     return await this.prisma.department.update({
       where: { id },
       data: { ...data },
@@ -40,6 +55,9 @@ export class DepartmentService {
   }
 
   async remove(id: string) {
+    const department = await this.findById(id);
+    if (!department)
+      throw new NotFoundException("This department doesn't exist!");
     return await this.prisma.department.delete({ where: { id } });
   }
 }

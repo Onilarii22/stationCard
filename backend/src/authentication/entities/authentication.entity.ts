@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEmail, IsString, IsStrongPassword } from 'class-validator';
 
-export class User {
+export class Authentication {
   @ApiProperty()
   @IsString()
   firstname: string;
@@ -15,11 +15,6 @@ export class User {
   email: string;
 
   @ApiProperty()
-  @IsString()
-  role: Role;
-
-  @ApiProperty()
   @IsStrongPassword()
   password: string;
-
 }

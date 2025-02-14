@@ -13,14 +13,32 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role{
+  COMPANY_EMPLOYE
+  STATION_EMPLOYE
+  ADMIN
+}
+
 model User {
   id        String   @id @default(cuid())
   firstname String
   lastname  String
   email     String   @unique
   password  String
-  Company   Company? @relation(fields: [companyId], references: [id])
-  companyId String?
+  role      Role     @default(COMPANY_EMPLOYE) 
+
+  companyEmploye CompanyEmploye?
+  stationEmploye StationEmploye?
+
+}
+
+model CompanyEmploye{
+  id        String   @id @default(cuid())
+
+  user User @relation(fields: [userId], references: [id])
+  userId String @unique
+  company   Company? @relation(fields: [companyId], references: [id])
+  companyId String
 }
 
 model Beneficiary {
@@ -34,14 +52,14 @@ model Beneficiary {
 
   transactions Transaction[]
   company      Company?      @relation(fields: [companyId], references: [id])
-  companyId    String?
+  companyId    String
 }
 
 model Company {
-  id            String        @id @default(cuid())
-  name          String        @unique
-  beneficiaries Beneficiary[]
-  workers       User[]
+  id              String           @id @default(cuid())
+  name            String           @unique
+  beneficiaries   Beneficiary[]
+  companyEmployes CompanyEmploye[]
 }
 
 model StationEmploye {
@@ -53,11 +71,15 @@ model StationEmploye {
 
   station     Station       @relation(fields: [stationId], references: [id])
   stationId   String
+  user User @relation(fields: [userId], references: [id])
+  userId String @unique
   Transaction Transaction[]
 }
 
 model Transaction {
   id String @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
 
   beneficiary   Beneficiary? @relation(fields: [beneficiaryId], references: [id])
   beneficiaryId String
@@ -94,32 +116,15 @@ model Municipality {
   id   String @id @default(cuid())
   name String @unique
 
-  cities City?  @relation(fields: [cityId], references: [id])
-  cityId String
-
-  District District[]
-}
-
-model City {
-  id   String @id @default(cuid())
-  name String @unique
-
-  municipalities Municipality[]
   department     Department?    @relation(fields: [departmentId], references: [id])
   departmentId   String?
+  District District[]
 }
 
 model Department {
   id   String @id @default(cuid())
   name String @unique
 
-  cities City[]
+  municipalities Municipality[]
 }
 
-model Admin {
-  id        String @id @default(cuid())
-  firstname String
-  lastname  String
-  email     String @unique
-  password  String
-}

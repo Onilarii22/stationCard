@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -11,7 +15,7 @@ export class UserService {
   async create(data: CreateUserDto) {
     const user = await this.findByEmail(data.email);
     const saltRounds = 10;
-    if (user) throw new ConflictException('Cet utilisateur existe déjà!');
+    if (user) throw new ConflictException('User already exists!');
 
     return await this.prisma.user.create({
       data: {
@@ -26,18 +30,30 @@ export class UserService {
   }
 
   async findById(id: string) {
-    return await this.prisma.user.findUnique({ where: { id } });
+    const user = await this.prisma.user.findUnique({ where: { id } });
+
+    if (!user) throw new NotFoundException('User not found!');
+
+    return user;
   }
 
   async findByEmail(email: string) {
-    return await this.prisma.user.findUnique({ where: { email } });
+    const user = await this.prisma.user.findUnique({ where: { email } });
+
+    if (!user) throw new NotFoundException('User not found!');
+
+    return user;
   }
 
   async update(id: string, data: UpdateUserDto) {
+    const user = await this.findById(id);
+    if (!user) throw new NotFoundException('User not found');
     return await this.prisma.user.update({ where: { id }, data });
   }
 
   async remove(id: string) {
+    const user = await this.findById(id);
+    if (!user) throw new NotFoundException("User not found");
     return await this.prisma.user.delete({ where: { id } });
   }
 }

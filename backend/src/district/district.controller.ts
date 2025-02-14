@@ -27,7 +27,7 @@ export class DistrictController {
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    return await this.districtService.findOne(id);
+    return await this.districtService.findById(id);
   }
 
   @Patch(':id')

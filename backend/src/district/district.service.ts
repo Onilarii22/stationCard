@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateDistrictDto } from './dto/create-district.dto';
 import { UpdateDistrictDto } from './dto/update-district.dto';
 import { PrismaService } from 'src/prisma/prisma.service';
@@ -8,9 +12,7 @@ export class DistrictService {
   constructor(private prisma: PrismaService) {}
 
   async create(data: CreateDistrictDto) {
-    const city = await this.prisma.district.findUnique({
-      where: { name: data.name },
-    });
+    const city = await this.findByName(data.name);
 
     if (city)
       throw new ConflictException(
@@ -24,18 +26,36 @@ export class DistrictService {
     return this.prisma.district.findMany({});
   }
 
-  async findOne(id: string) {
-    return await this.prisma.district.findUnique({ where: { id } });
+  async findByName(name: string) {
+    const district = await this.prisma.district.findUnique({
+      where: { name },
+    });
+
+    if (!district) throw new NotFoundException('District not found!');
+
+    return district;
+  }
+
+  async findById(id: string) {
+    const district = await this.prisma.district.findUnique({ where: { id } });
+
+    if (!district) throw new NotFoundException('District not found!');
+
+    return district;
   }
 
   async update(id: string, data: UpdateDistrictDto) {
+    const district = await this.findById(id);
+    if (!district) throw new NotFoundException("This district doesn't exist!");
     return await this.prisma.district.update({
       where: { id },
-      data: { ...data },
+      data,
     });
   }
 
   async remove(id: string) {
-    return await this.prisma.municipality.delete({ where: { id } });
+    const district = await this.findById(id);
+    if (!district) throw new NotFoundException("This district doesn't exist!");
+    return await this.prisma.district.delete({ where: { id } });
   }
 }
