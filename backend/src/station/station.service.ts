@@ -14,8 +14,13 @@ export class StationService {
     });
   }
 
-  async findAll() {
-    return await this.prisma.station.findMany();
+  async findAll(page: number = 1, take: number = 10) {
+    const station = await this.prisma.station.findMany({
+      skip: (page - 1) * take,
+      take,
+    });
+
+    return { station, count: await this.prisma.station.count() };
   }
 
   async findOne(id: string) {

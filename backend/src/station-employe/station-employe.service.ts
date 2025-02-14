@@ -25,8 +25,13 @@ export class StationEmployeService {
     });
   }
 
-  async findAll() {
-    return await this.prisma.stationEmploye.findMany();
+  async findAll(page: number = 1, take: number = 10) {
+    const stationEmploye = await this.prisma.stationEmploye.findMany({
+      skip: (page - 1) * take,
+      take,
+    });
+
+    return { stationEmploye, count: await this.prisma.stationEmploye.count() };
   }
 
   async findById(id: string) {
@@ -45,7 +50,7 @@ export class StationEmployeService {
     });
 
     if (!employe) throw new NotFoundException("This employe doesn't exist");
-    
+
     return employe;
   }
 

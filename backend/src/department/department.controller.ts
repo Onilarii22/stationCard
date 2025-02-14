@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { DepartmentService } from './department.service';
 import { CreateDepartmentDto } from './dto/create-department.dto';
@@ -21,8 +22,22 @@ export class DepartmentController {
   }
 
   @Get()
-  async findAll() {
-    return await this.departmentService.findAll();
+  async findAll(
+    @Query('page') page: number = 1,
+    @Query('take') take: number = 10,
+  ) {
+    const items = await this.departmentService.findAll(page, take);
+    const totalPages = Math.ceil(items.count / take);
+
+    return {
+      data: items.departements,
+      pagination: {
+        currentPage: page,
+        totalItems: items.count,
+        totalPages,
+        itemsPerPage: take,
+      },
+    };
   }
 
   @Get(':id')

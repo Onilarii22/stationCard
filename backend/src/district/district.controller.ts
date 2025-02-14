@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { DistrictService } from './district.service';
 import { CreateDistrictDto } from './dto/create-district.dto';
@@ -21,8 +22,21 @@ export class DistrictController {
   }
 
   @Get()
-  async findAll() {
-    return await this.districtService.findAll();
+  async findAll(
+    @Query('page') page: number = 1,
+    @Query('take') take: number = 10,
+  ) {
+    const items = await this.districtService.findAll(page, take)
+    const totalPages = items.count;
+    return {
+      data: items.district,
+      pagination: {
+        currentPage: page,
+        totalItems: items.count,
+        totalPages,
+        itemsPerPage: take,
+      },
+    };
   }
 
   @Get(':id')

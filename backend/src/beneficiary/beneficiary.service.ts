@@ -20,8 +20,13 @@ export class BeneficiaryService {
     });
   }
 
-  async findAll() {
-    return await this.prisma.beneficiary.findMany();
+  async findAll(page: number = 1, take: number = 10) {
+    const beneficiaries = await this.prisma.beneficiary.findMany({
+      skip: (page - 1) * take,
+      take,
+    });
+
+    return {beneficiaries, count: await this.prisma.beneficiary.count()}
   }
 
   async findById(id: string) {

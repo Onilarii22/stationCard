@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { MunicipalityService } from './municipality.service';
 import { CreateMunicipalityDto } from './dto/create-municipality.dto';
@@ -21,8 +22,21 @@ export class MunicipalityController {
   }
 
   @Get()
-  async findAll() {
-    return await this.municipalityService.findAll();
+  async findAll(
+    @Query('page') page: number = 1,
+    @Query('take') take: number = 10,
+  ) {
+    const items = await this.municipalityService.findAll(page, take)
+    const totalPages = items.count;
+    return {
+      data: items.municipality,
+      pagination: {
+        currentPage: page,
+        totalItems: items.count,
+        totalPages,
+        itemsPerPage: take,
+      },
+    };
   }
 
   @Get(':id')

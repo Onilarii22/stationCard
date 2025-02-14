@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { StationEmployeService } from './station-employe.service';
 import { CreateStationEmployeDto } from './dto/create-station-employe.dto';
 import { UpdateStationEmployeDto } from './dto/update-station-employe.dto';
@@ -13,8 +13,21 @@ export class StationEmployeController {
   }
 
   @Get()
-  async findAll() {
-    return await this.stationEmployeService.findAll();
+  async findAll(
+    @Query('page') page: number = 1,
+    @Query('take') take: number = 10,
+  ) {
+    const items = await this.stationEmployeService.findAll(page, take)
+    const totalPages = items.count;
+    return {
+      data: items.stationEmploye,
+      pagination: {
+        currentPage: page,
+        totalItems: items.count,
+        totalPages,
+        itemsPerPage: take,
+      },
+    };
   }
 
   @Get(':id')

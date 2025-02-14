@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmail, IsString, IsStrongPassword } from 'class-validator';
+import { Role } from '@prisma/client';
+import { IsEmail, IsEnum, IsString, IsStrongPassword } from 'class-validator';
 
 export class User {
   @ApiProperty()
@@ -15,11 +16,10 @@ export class User {
   email: string;
 
   @ApiProperty()
-  @IsString()
+  @IsEnum(Role)
   role: Role;
 
   @ApiProperty()
   @IsStrongPassword()
   password: string;
-
 }

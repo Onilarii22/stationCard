@@ -18,8 +18,13 @@ export class CompanyService {
     return await this.prisma.company.create({ data });
   }
 
-  async findAll() {
-    return await this.prisma.company.findMany();
+  async findAll(page: number = 1, take: number = 10) {
+    const companies = await this.prisma.company.findMany({
+      skip: (page - 1) * take,
+      take,
+    });
+
+    return { companies, count: await this.prisma.company.count() };
   }
 
   async findById(id: string) {

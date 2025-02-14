@@ -24,8 +24,12 @@ export class DepartmentService {
     return await this.prisma.department.create({ data });
   }
 
-  async findAll() {
-    return this.prisma.department.findMany({});
+  async findAll(take: number = 10, page: number = 1) {
+    const departements = await this.prisma.department.findMany({
+      skip: (page - 1) * take,
+      take,
+    });
+    return {departements, count: await this.prisma.department.count()};
   }
 
   async findById(id: string) {

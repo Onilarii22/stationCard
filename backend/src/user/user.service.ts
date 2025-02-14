@@ -25,8 +25,13 @@ export class UserService {
     });
   }
 
-  async findAll() {
-    return await this.prisma.user.findMany();
+  async findAll(page: number = 1, take: number = 10) {
+    const users = await this.prisma.user.findMany({
+      skip: (page - 1) * take,
+      take,
+    });
+
+    return { users, count: await this.prisma.user.count() };
   }
 
   async findById(id: string) {
@@ -53,7 +58,7 @@ export class UserService {
 
   async remove(id: string) {
     const user = await this.findById(id);
-    if (!user) throw new NotFoundException("User not found");
+    if (!user) throw new NotFoundException('User not found');
     return await this.prisma.user.delete({ where: { id } });
   }
 }

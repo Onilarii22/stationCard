@@ -21,4 +21,8 @@ export class StationEmploye {
   @ApiProperty()
   @IsString()
   stationId: string;
+
+  @ApiProperty()
+  @IsString()
+  userId: string;
 }

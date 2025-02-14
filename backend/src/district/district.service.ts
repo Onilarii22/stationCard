@@ -22,8 +22,13 @@ export class DistrictService {
     return await this.prisma.district.create({ data });
   }
 
-  async findAll() {
-    return this.prisma.district.findMany({});
+  async findAll(page: number = 1, take: number = 10) {
+    const district = await this.prisma.district.findMany({
+      skip: (page - 1) * take,
+      take,
+    });
+
+    return { district, count: await this.prisma.district.count() };
   }
 
   async findByName(name: string) {

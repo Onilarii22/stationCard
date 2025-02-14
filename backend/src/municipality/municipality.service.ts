@@ -22,15 +22,13 @@ export class MunicipalityService {
     return await this.prisma.municipality.create({ data });
   }
 
-  async findAll( ) {
-    // const { skip, take, cursor, where, orderBy } = params;
-    return this.prisma.municipality.findMany({
-      // skip,
-      // take,
-      // cursor,
-      // where,
-      // orderBy,
+  async findAll(page: number = 1, take: number = 10) {
+    const municipality = await this.prisma.municipality.findMany({
+      skip: (page - 1) * take,
+      take,
     });
+
+    return { municipality, count: await this.prisma.municipality.count() };
   }
 
   async findOne(id: string) {
